@@ -2,8 +2,8 @@ from typing import List, Tuple
 
 def program3(n: int, W: int, heights: List[int], widths: List[int]) -> Tuple[int, int, List[int]]:
     """
-    Solution to Program 3 without bitmasking but achieving Θ(n⋅2^(n-1)) complexity.
-
+    Solution to Program 3
+    
     Parameters:
     n (int): number of paintings
     W (int): width of the platform
@@ -15,67 +15,83 @@ def program3(n: int, W: int, heights: List[int], widths: List[int]) -> Tuple[int
     int: optimal total height
     List[int]: number of paintings on each platform
     """
+    ############################
+    # Add you code here
+    ############################
+    memo = {} # Memoization dictionary to store min height and platform configuration for subsets of paintings
 
     
-    memo_table = {} # store results of subproblems in a dictionary
+    def get_feasible_subsets(): # Helper to get all subsets that fit within width W
+        feasible_subsets = []
+        for subset in range(1 << n):  # Generate all subsets using bitmasking; iterates from 0 to 2^n-1
+            if subset == 0:
+                continue  # Skip empty subset
+            subset_width = sum(widths[i] for i in range(n) if subset & (1 << i))
+            if subset_width <= W:
+                feasible_subsets.append(subset)
+        return feasible_subsets
+
+    
+   
+    feasible_subsets = get_feasible_subsets() # Get feasible subsets of paintings
 
 
-    def min_height(idx: int, remaining_width: int, platforms: List[int], platform_counts: List[int]) -> Tuple[int, int, List[int]]:
+    def min_height(mask: int) -> Tuple[int, int, List[int]]: # Helper recursive function to find the minimum height arrangement
+
+        if mask == 0:  # Base case: no paintings left for arrangement
+            return (0, 0, [])
+
+    
+        if mask in memo:  # Check if result is already computed
+            return memo[mask]
         
-        if idx == n: # base case - all paintings placed
-            return len(platforms), sum(platforms), platform_counts
-        
+        min_platforms = float('inf')
+        min_total_height = float('inf')
+        best_arrangement = []
 
-        # check if this state has been memo_tableized
-        state = (idx, remaining_width, tuple(platforms)) 
-        if state in memo_table:
-            return memo_table[state]
-        
+        for subset in feasible_subsets: # Try each feasible subset and calculate the result
 
-        # option 1 - place the current painting on a new platform
-        new_platforms = platforms + [heights[idx]]
-        new_counts = platform_counts + [1]  # New platform with 1 painting
-        platforms_used, total_height, arrangement = min_height(idx + 1, W - widths[idx], new_platforms, new_counts)
+            if (mask & subset) == subset:  # Ensure the subset is a part of the current mask
+                remaining_mask = mask ^ subset  # Paintings left after placing this subset on a platform
+                max_height_in_subset = max(heights[i] for i in range(n) if subset & (1 << i))
+                
+                # Recursive call
+                platforms_used, height, arrangement = min_height(remaining_mask)
+                platforms_used += 1
+                height += max_height_in_subset
 
-        
-        # option 2 - try to add the painting to an existing platform if possible
-        if platforms and widths[idx] <= remaining_width: # check if painting can be added to the last platform
-            alt_platforms = platforms[:]
-            alt_platforms[-1] = max(alt_platforms[-1], heights[idx])
-            alt_counts = platform_counts[:]
-            alt_counts[-1] += 1  # increment the painting count on the current platform
-
-            new_platforms_used, new_total_height, new_arrangement = min_height(idx + 1, remaining_width - widths[idx], alt_platforms, alt_counts)
-
-            # update if this configuration provides a better minimum height
-            if new_total_height < total_height or (new_total_height == total_height and new_platforms_used < platforms_used):
-                platforms_used, total_height, arrangement = new_platforms_used, new_total_height, new_arrangement
-
-      
-        # store the result in memoization table
-        memo_table[state] = (platforms_used, total_height, arrangement)
-        return memo_table[state]
-
-    # start recursion with the first painting and empty platform setup
-    total_platforms, total_height, num_paintings = min_height(0, W, [], [])
-    return total_platforms, total_height, num_paintings
+                if height < min_total_height or (height == min_total_height and platforms_used < min_platforms):
+                    min_platforms = platforms_used
+                    min_total_height = height
+                    best_arrangement = [bin(subset).count('1')] + arrangement
+                # Update minimum height and arrangement if this is the best found so far
 
 
-if __name__ == '__main__':
+        memo[mask] = (min_platforms, min_total_height, best_arrangement)
+        return memo[mask] # Store the result in memo
+
+
+    # Start the recursive function with all paintings
+    total_mask = (1 << n) - 1  # Mask with all paintings included
+    m, total_height, num_paintings = min_height(total_mask)
+    return m, total_height, num_paintings
+
+
+if __name__ == '__main__': # Main function
     n, W = map(int, input().split())
     heights = list(map(int, input().split()))
     widths = list(map(int, input().split()))
+
     m, total_height, num_paintings = program3(n, W, heights, widths)
+
     print(m)
     print(total_height)
-    for count in num_paintings:
-        print(count)
+    for i in num_paintings:
+        print(i)
 
 
 """
-Algorithm3 explores all possible ways to arrange the paintings onto platforms 
-while respecting the width constraint - using recursion and memoization to optimize 
-the total height. It considers each painting either on a new platform or added 
-to an existing platform and finds the configuration that minimizes the total height.
-The time complexity is Θ(n⋅2^(n-1)) due to the recursive evaluation of subsets.
+Given the inputs n (number of paintings), W (width of the platform), heights (heights of the paintings), and widths (widths of the paintings),
+program3 generates feasible subsets with bitmasking. 
+Then, using a recursive function min_height we find the optimal arrangement of paintings on platforms with the total mask including all paintings.
 """
