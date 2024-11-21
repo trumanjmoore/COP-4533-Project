@@ -2,7 +2,7 @@ from typing import List, Tuple
 
 def program3(n: int, W: int, heights: List[int], widths: List[int]) -> Tuple[int, int, List[int]]:
     """
-    Solution to Program 3 without bitmasking but achieving Θ(n⋅2^(n-1)) complexity.
+    Solution to Program 3 
 
     Parameters:
     n (int): number of paintings
