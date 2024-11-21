@@ -21,7 +21,7 @@ def program4(n: int, W: int, heights: List[int], widths: List[int]) -> Tuple[int
     # Add you code here
     ############################
 
-    costs = {}  # stores already seen subproblems, used for memoization
+    costs = {}  # stores already seen subproblems
     def min_cost(p):
         if p == 0:
             return 0, 0, []  # base case, returns a lists with no paintings
@@ -38,7 +38,7 @@ def program4(n: int, W: int, heights: List[int], widths: List[int]) -> Tuple[int
         for j in range(p, 0, -1):
             curr_width = 0
             for k in range(j-1, p):
-                curr_width += widths[k]  # go through all paintings on the platform to get the width of the platform
+                curr_width += widths[k]  # get the width of the platform
 
             if curr_width > W:
                 break  # if the platform width is greater that the max width, the configuration is not possible
@@ -49,9 +49,9 @@ def program4(n: int, W: int, heights: List[int], widths: List[int]) -> Tuple[int
             prev_num_platforms, prev_cost, prev_platform_paintings = min_cost(j - 1)
             curr_cost = prev_cost + platform_height
             curr_num_platforms = prev_num_platforms + 1
-            curr_platform_paintings = prev_platform_paintings + [p - (j + 1)]
+            curr_platform_paintings = prev_platform_paintings + [p - j + 1]
 
-            # if this cost is less that the min cost so far, update the minimum seen value
+            # if this cost is less that the min cost so far,
             if curr_cost < min_cost_p:
                 min_cost_p = curr_cost
                 num_platforms_p = curr_num_platforms
@@ -67,13 +67,14 @@ def program4(n: int, W: int, heights: List[int], widths: List[int]) -> Tuple[int
 
 
 if __name__ == '__main__':
-    #n, W = map(int, input().split())
+   
     #heights = list(map(int, input().split()))
     #widths = list(map(int, input().split()))
     n, W = map(int, input().split())
     heights = list(map(int, input().split()))
     widths = list(map(int, input().split()))
 
+    
     m, total_height, num_paintings = program4(n, W, heights, widths)
 
     print(m)

@@ -60,8 +60,8 @@ def program5A(n: int, W: int, heights: List[int], widths: List[int]) -> Tuple[in
         return costs[p]
 
     # starting at n, recursively find the min cost of all permutations of paintings
-    num_platforms, min_cost_value, platform_paintings = min_cost(n)
-    return num_platforms, min_cost_value, platform_paintings
+    num_platforms, final_min_cost, platform_paintings = min_cost(n)
+    return num_platforms, final_min_cost, platform_paintings
 
 
 if __name__ == '__main__':
