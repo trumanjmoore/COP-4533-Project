@@ -1,3 +1,4 @@
+
 from typing import List, Tuple
 
 def program3(n: int, W: int, heights: List[int], widths: List[int]) -> Tuple[int, int, List[int]]:
