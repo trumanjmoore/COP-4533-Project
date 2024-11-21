@@ -27,7 +27,7 @@ def program3(n: int, W: int, heights: List[int], widths: List[int]) -> Tuple[int
             return len(platforms), sum(platforms), platform_counts
         
 
-        # check if this state has been memo_tableized
+        # check if this state has been memoized
         state = (idx, remaining_width, tuple(platforms)) 
         if state in memo_table:
             return memo_table[state]
